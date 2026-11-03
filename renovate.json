@@ -1,0 +1,44 @@
+{
+  "extends": [
+    "config:base",
+    ":gitSignOff",
+    ":disableDependencyDashboard"
+  ],
+  "ignorePaths": [
+    ".github/workflows/auto-release.yaml",
+    ".github/workflows/release.yaml",
+    ".github/workflows/test.yaml"
+  ],
+  "labels": [
+    "dependency"
+  ],
+  "separateMinorPatch": true,
+  "postUpgradeTasks": {
+    "commands": [
+      "make gen-golden-all"
+    ],
+    "fileFilters": [
+      "tests/golden/**"
+    ],
+    "executionMode": "update"
+  },
+  "suppressNotifications": [
+    "artifactErrors"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "patch",
+        "digest"
+      ],
+      "matchCurrentVersion": "!/^v?0\\./",
+      "automerge": true,
+      "platformAutomerge": false,
+      "labels": [
+        "dependency",
+        "automerge",
+        "bump:patch"
+      ]
+    }
+  ]
+}

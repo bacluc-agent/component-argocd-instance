@@ -1,0 +1,6 @@
+name: argocd-instance
+title: argocd-instance
+version: master
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/partials/nav.adoc
