@@ -1,0 +1,46 @@
+parameters:
+  argocd_instance:
+    instances:
+      argocd-team-1/instance-1:
+        config:
+          spec:
+            sso:
+              provider: dex
+              dex:
+                # Allow authentication via OpenShift
+                openShiftOAuth: true
+        projectDefaults:
+          spec:
+            # Disallow creation of cluster-scoped resources
+            clusterResourceWhitelist: []
+        projects:
+          team-1:
+            spec:
+              destinations:
+                - namespace: team-1-*
+                  server: https://kubernetes.default.svc
+              sourceNamespaces:
+                - team-1-argocdapps
+      argocd-team-2/instance-2:
+        config:
+          spec:
+            rbac:
+              # Deny all access by default
+              defaultPolicy: role:none
+        projects:
+          # Nulled projects are dropped from the rendered AppProjects
+          team-2:
+            spec:
+              clusterResourceWhitelist:
+                - group: ''
+                  kind: Namespace
+                - group: rbac.authorization.k8s.io
+                  kind: ClusterRole
+                - group: rbac.authorization.k8s.io
+                  kind: ClusterRoleBinding
+              destinations:
+                - namespace: team-2-*
+                  server: https://kubernetes.default.svc
+              sourceNamespaces:
+                - team-2-argocdapps
+          team-null: null

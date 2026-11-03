@@ -7,7 +7,7 @@
       "name": "argocd-instance",
       "slug": "argocd-instance",
       "parameter_key": "argocd_instance",
-      "test_cases": "defaults multiple-instances",
+      "test_cases": "defaults openshift multiple-instances multi-tenant",
       "add_lib": "n",
       "add_pp": "n",
       "add_golden": "y",

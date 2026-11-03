@@ -1,0 +1,27 @@
+parameters:
+  argocd_instance:
+    instances:
+      vshn-suppliers-argocd/suppliers:
+        config:
+          spec:
+            # OpenShift-specific setup: SSO via OpenShift and WebGUI route
+            sso:
+              provider: dex
+              dex:
+                # Allow authentication via OpenShift
+                openShiftOAuth: true
+
+            controller:
+              resources:
+                requests:
+                  memory: 1Gi
+                  cpu: 100m
+
+            server:
+              # Host used for the generated Route/WebGUI
+              host: argocd-suppliers.example.com
+              # Expose WebGUI
+              route:
+                enabled: true
+                tls:
+                  termination: reencrypt

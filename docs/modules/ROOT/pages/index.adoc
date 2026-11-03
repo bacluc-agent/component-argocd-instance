@@ -1,0 +1,21 @@
+= argocd-instance
+
+argocd-instance is a Commodore component to render https://argo-cd.readthedocs.io/[ArgoCD] instance
+Custom Resources (`ArgoCD`) and https://argo-cd.readthedocs.io/en/stable/user-guide/projects/AppProjects[AppProjects] managed by the
+https://github.com/redhat-developer/gitops-operator/[ArgoCD operator].
+
+It supports teams taking over and operating single ArgoCD instances: the team
+owns the configuration of its ArgoCD instances, while the ArgoCD operator is
+installed by xref:index.adoc#_prerequisites[another component] (https://github.com/projectsyn/component-argocd[component-argocd]).
+
+The instance configuration is a copy of the `instances` parameter structure of
+https://github.com/projectsyn/component-argocd[component-argocd], so existing instance configurations can
+be moved over unchanged.
+
+See the xref:references/parameters.adoc[parameters] reference for further details.
+
+## Prerequisites
+
+The component only renders Kubernetes resources. The https://github.com/redhat-developer/gitops-operator/[argocd-operator]
+has to be installed on the target cluster. One option is to use
+https://github.com/projectsyn/component-argocd[component-argocd].

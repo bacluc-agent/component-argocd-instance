@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  labels:
+    name: suppliers
+  name: suppliers
+  namespace: vshn-suppliers-argocd
+spec:
+  applicationInstanceLabelKey: suppliers.vshn-suppliers-argocd/instance
+  rbac:
+    defaultPolicy: role:none
+    policy: |
+      g, openshiftroot, role:admin
+
+      g, supp-supp1, role:supp1
+      g, supp-supp2, role:supp2
+
+      p, role:supp1, clusters, get, *, allow
+      p, role:supp1, certificates, get, *, allow
+      p, role:supp1, projects, get, supp1, allow
+      p, role:supp1, applications, *, supp1/*, allow
+      p, role:supp1, logs, get, supp1/*, allow
+      p, role:supp1, repositories, *, supp1/*, allow
+
+      p, role:supp2, clusters, get, *, allow
+      p, role:supp2, certificates, get, *, allow
+      p, role:supp2, projects, get, supp2, allow
+      p, role:supp2, applications, *, supp2/*, allow
+      p, role:supp2, logs, get, supp2/*, allow
+      p, role:supp2, repositories, *, supp2/*, allow
+    scopes: '[groups]'
+  server:
+    host: argocd-suppliers.example.com
+    route:
+      enabled: true
+      tls:
+        termination: reencrypt
+  sourceNamespaces:
+    - supp1-argocdapps
+    - supp2-argocdapps

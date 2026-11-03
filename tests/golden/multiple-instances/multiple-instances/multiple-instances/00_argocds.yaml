@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  labels:
+    name: instance-1
+  name: instance-1
+  namespace: argocd-team-1
+spec:
+  applicationInstanceLabelKey: instance-1.argocd-team-1/instance
+  sso:
+    dex:
+      openShiftOAuth: true
+    provider: dex
+---
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  labels:
+    name: instance-2
+  name: instance-2
+  namespace: argocd-team-2
+spec:
+  applicationInstanceLabelKey: instance-2.argocd-team-2/instance
+  rbac:
+    defaultPolicy: role:none

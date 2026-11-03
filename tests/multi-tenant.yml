@@ -1,0 +1,87 @@
+parameters:
+  argocd_instance:
+    instances:
+      vshn-suppliers-argocd/suppliers:
+        config:
+          spec:
+            rbac:
+              # Deny all access by default
+              defaultPolicy: role:none
+
+              # Ensure access tokens contain the "groups" attribute
+              scopes: '[groups]'
+
+              # Map supplier groups to roles and only allow each role access to
+              # its own AppProject
+              policy: |
+                g, openshiftroot, role:admin
+
+                g, supp-supp1, role:supp1
+                g, supp-supp2, role:supp2
+
+                p, role:supp1, clusters, get, *, allow
+                p, role:supp1, certificates, get, *, allow
+                p, role:supp1, projects, get, supp1, allow
+                p, role:supp1, applications, *, supp1/*, allow
+                p, role:supp1, logs, get, supp1/*, allow
+                p, role:supp1, repositories, *, supp1/*, allow
+
+                p, role:supp2, clusters, get, *, allow
+                p, role:supp2, certificates, get, *, allow
+                p, role:supp2, projects, get, supp2, allow
+                p, role:supp2, applications, *, supp2/*, allow
+                p, role:supp2, logs, get, supp2/*, allow
+                p, role:supp2, repositories, *, supp2/*, allow
+
+            sourceNamespaces:
+              - supp1-argocdapps
+              - supp2-argocdapps
+
+            server:
+              # Host used for the generated Route/WebGUI
+              host: argocd-suppliers.example.com
+              route:
+                enabled: true
+                tls:
+                  termination: reencrypt
+
+        projectDefaults:
+          spec:
+            # Disallow creation of cluster-scoped resources
+            clusterResourceWhitelist: []
+            sourceRepos:
+              - https://*
+              - ssh://*
+              - git@*
+
+        projects:
+          supp1:
+            spec:
+              destinations:
+                - namespace: supp1-*
+                  server: https://kubernetes.default.svc
+              sourceNamespaces:
+                - supp1-argocdapps
+
+          supp2:
+            spec:
+              clusterResourceWhitelist:
+                - group: ''
+                  kind: Namespace
+                - group: apiextensions.k8s.io
+                  kind: CustomResourceDefinition
+                - group: rbac.authorization.k8s.io
+                  kind: ClusterRole
+                - group: rbac.authorization.k8s.io
+                  kind: ClusterRoleBinding
+                - group: admissionregistration.k8s.io
+                  kind: ValidatingAdmissionPolicy
+                - group: admissionregistration.k8s.io
+                  kind: ValidatingAdmissionPolicyBinding
+                - group: admissionregistration.k8s.io
+                  kind: ValidatingWebhookConfiguration
+              destinations:
+                - namespace: supp2-*
+                  server: https://kubernetes.default.svc
+              sourceNamespaces:
+                - supp2-argocdapps
