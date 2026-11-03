@@ -1,0 +1,9 @@
+---
+parameters:
+  argocd_instance:
+    =_metadata:
+      multi_tenant: true
+      multi_instance: true
+      multi_version: true
+
+    instances: {}

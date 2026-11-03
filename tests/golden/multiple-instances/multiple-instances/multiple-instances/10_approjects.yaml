@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  labels:
+    name: team-1
+  name: team-1
+  namespace: argocd-team-1
+spec:
+  clusterResourceWhitelist: []
+  destinations:
+    - namespace: team-1-*
+      server: https://kubernetes.default.svc
+  sourceNamespaces:
+    - team-1-argocdapps
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  labels:
+    name: team-2
+  name: team-2
+  namespace: argocd-team-2
+spec:
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+  destinations:
+    - namespace: team-2-*
+      server: https://kubernetes.default.svc
+  sourceNamespaces:
+    - team-2-argocdapps

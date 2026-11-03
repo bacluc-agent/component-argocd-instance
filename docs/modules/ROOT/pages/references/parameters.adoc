@@ -1,0 +1,85 @@
+= Parameters
+
+Each entry in `instances` renders one `ArgoCD` custom resource and zero or more
+`AppProject` resources. The instance key is a namespaced name
+(`<namespace>/<name>`) which determines the namespace and name of the rendered
+`ArgoCD` resource. Multiple ArgoCD instances in the same namespace aren't
+supported.
+
+== `instances`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+
+ArgoCD instances to render, keyed by namespaced name.
+
+Each instance supports the following fields:
+`config` (`spec` of the rendered `ArgoCD` resource),
+`projectDefaults` (defaults merged into the `spec` of every rendered
+`AppProject` of the instance) and `projects` (rendered `AppProject` resources,
+keyed by project name, their `spec` is merged over `projectDefaults`).
+
+== Examples
+
+Single instance with two projects:
+
+[source,yaml]
+----
+parameters:
+  argocd_instance:
+    instances:
+      argo-team1/instance-1:
+        config:
+          spec:
+            rbac:
+              defaultPolicy: role:none
+        projectDefaults:
+          spec:
+            clusterResourceWhitelist: []
+        projects:
+          instance-1:
+            spec:
+              destinations:
+                - namespace: instance-1-*
+                  server: https://kubernetes.default.svc
+----
+
+Team setup taken over from component-argocd, with OpenShift SSO and RBAC
+policies per supplier team:
+
+[source,yaml]
+----
+parameters:
+  argocd_instance:
+    instances:
+      vshn-suppliers-argocd/suppliers:
+        config:
+          spec:
+            sso:
+              provider: dex
+              dex:
+                openShiftOAuth: true
+            rbac:
+              defaultPolicy: role:none
+              scopes: '[groups]'
+              policy: |
+                g, openshiftroot, role:admin
+                g, supp-supp1, role:supp1
+                p, role:supp1, clusters, get, *, allow
+                p, role:supp1, projects, get, supp1, allow
+                p, role:supp1, applications, *, supp1/*, allow
+        projectDefaults:
+          spec:
+            clusterResourceWhitelist: []
+            sourceRepos:
+              - https://*
+              - ssh://*
+              - git@*
+        projects:
+          supp1:
+            spec:
+              destinations:
+                - namespace: supp1-*
+                  server: https://kubernetes.default.svc
+----

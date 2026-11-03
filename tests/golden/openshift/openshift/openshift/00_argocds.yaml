@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  labels:
+    name: suppliers
+  name: suppliers
+  namespace: vshn-suppliers-argocd
+spec:
+  applicationInstanceLabelKey: suppliers.vshn-suppliers-argocd/instance
+  controller:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+  server:
+    host: argocd-suppliers.example.com
+    route:
+      enabled: true
+      tls:
+        termination: reencrypt
+  sso:
+    dex:
+      openShiftOAuth: true
+    provider: dex
